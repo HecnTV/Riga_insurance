@@ -41,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IInsuranceCompany.cs" />
+    <Compile Include="InsuranceCompany.cs" />
     <Compile Include="IPolicy.cs" />
+    <Compile Include="Policy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Risk.cs" />
   </ItemGroup>
