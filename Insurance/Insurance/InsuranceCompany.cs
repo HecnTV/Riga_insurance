@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Insurance
 {
@@ -7,7 +8,7 @@ namespace Insurance
     {
         public InsuranceCompany(string name)
         {
-            //Name = name;
+            Name = name;
         }
 
         public string Name { get; }
@@ -18,7 +19,10 @@ namespace Insurance
             short validMonths,
             IList<Risk> selectedRisks)
         {
-            throw new NotImplementedException();
+            if (!selectedRisks.All(risk => AvailableRisks.Contains(risk)))
+                throw new ArgumentException();
+
+            return new Policy();
         }
 
         public void AddRisk(string nameOfInsuredObject, Risk risk, DateTime validFrom, DateTime effectiveDate)
