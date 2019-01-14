@@ -24,6 +24,7 @@ namespace Insurance
             IList<Risk> selectedRisks)
         {
             #region validation
+
             if (selectedRisks == null)
                 throw new ArgumentException("Selected risks can't be null.");
 
@@ -49,6 +50,7 @@ namespace Insurance
             policy.ValidFrom < validFrom.AddMonths(validMonths) &&
             policy.ValidTill > validFrom))
                 throw new ArgumentException("Impossible sell some policy to one insured object in overlapping period.");
+
             #endregion
 
             var validTill = validFrom.AddMonths(validMonths);
@@ -79,6 +81,8 @@ namespace Insurance
         {
             var policy = GetPolicy(nameOfInsuredObject, effectiveDate);
 
+            #region Validation
+
             if (policy == null)
                 throw new ArgumentException("Impossible add risk to nonexistent policy.");
 
@@ -94,13 +98,17 @@ namespace Insurance
             if (policy.ValidTill < validFrom)
                 throw new ArgumentException("Valid date must be equal to or greater than date of policy.");
 
+            #endregion
+
             policy.InsuredRisks.Add(risk);
-            policy.Premium = policy.InsuredRisks.Sum(r => r.YearlyPrice);
+            policy.Premium = CalculatePremium(policy.InsuredRisks, policy.ValidFrom, policy.ValidTill);
         }
 
         public void RemoveRisk(string nameOfInsuredObject, Risk risk, DateTime validTill, DateTime effectiveDate)
         {
             var policy = GetPolicy(nameOfInsuredObject, effectiveDate);
+
+            #region Validation
 
             if (policy == null)
                 throw new ArgumentException("Impossible delete risk from nonexistent policy.");
@@ -116,17 +124,24 @@ namespace Insurance
 
             if (!policy.InsuredRisks.Contains(risk))
                 throw new ArgumentException("Can't remove nonexistent risk from policy.");
+            
+            #endregion
 
             policy.InsuredRisks.Remove(risk);
+            policy.Premium = CalculatePremium(policy.InsuredRisks, policy.ValidFrom, policy.ValidTill);
         }
 
         public IPolicy GetPolicy(string nameOfInsuredObject, DateTime effectiveDate)
         {
+            #region Validation
+
             if (nameOfInsuredObject == null)
                 throw new ArgumentException("Name of insured object can't be null.");
 
             if (nameOfInsuredObject == string.Empty)
                 throw new ArgumentException("Name of insured object can't be empty.");
+
+            #endregion
 
             return SoldPolicy.FirstOrDefault(policy =>
                 policy.NameOfInsuredObject == nameOfInsuredObject &&

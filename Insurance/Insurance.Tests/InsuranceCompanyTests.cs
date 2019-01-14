@@ -376,26 +376,29 @@ namespace Insurance.Tests
             Assert.IsTrue(soldPolicy.InsuredRisks.Contains(fireRisk));
         }
 
-        //[Test]
-        //public void ReculculatesPremiunAfterAddRiskToPolicy()
-        //{
-        //    var fireRisk = new Risk { Name = "Fire", YearlyPrice = 140 };
-        //    var expectedPremium = _testRisk.YearlyPrice + fireRisk.YearlyPrice;
-        //    _testInsuranceCompany.AvailableRisks.Add(fireRisk);
-        //    var soldPolicy = _testInsuranceCompany.SellPolicy(
-        //        InsuredObjectName,
-        //        _testDate,
-        //        2,
-        //        new List<Risk> { _testRisk });
+        [Test]
+        public void ReculculatesPremiumAfterAddRiskToPolicy()
+        {
+            var fireRisk = new Risk { Name = "Fire", YearlyPrice = 140 };
+            var validMonths = (short)2;
+            var timeSpan = _testDate.AddMonths(validMonths) - _testDate;
+            var expectedPremium = Convert.ToDecimal(0.71*timeSpan.Days);
+            _testInsuranceCompany.AvailableRisks.Add(fireRisk);
 
-        //    _testInsuranceCompany.AddRisk(
-        //        InsuredObjectName,
-        //        fireRisk,
-        //        _testDate,
-        //        _testDate);
+            var soldPolicy = _testInsuranceCompany.SellPolicy(
+                InsuredObjectName,
+                _testDate,
+                validMonths,
+                new List<Risk> { _testRisk });
 
-        //    Assert.AreEqual(expectedPremium, soldPolicy.Premium);
-        //}
+            _testInsuranceCompany.AddRisk(
+                InsuredObjectName,
+                fireRisk,
+                _testDate,
+                _testDate);
+
+            Assert.AreEqual(expectedPremium, soldPolicy.Premium);
+        }
 
         [Test]
         public void ProvidesExceptionWhenTryRemoveRiskToNonexistentPolicy()
@@ -502,25 +505,31 @@ namespace Insurance.Tests
 
             Assert.IsFalse(soldPolicy.InsuredRisks.Contains(fireRisk));
         }
-
-        /*[Test]
-        public void AddsRiskToPolicy()
+        
+        //120=260 per year
+        //120/365=0.33 per day
+        [Test]
+        public void ReculculatesPremiumAfterRemoveRiskFromPolicy()
         {
             var fireRisk = new Risk { Name = "Fire", YearlyPrice = 140M };
+            var validMonths = (short)2;
+            var timeSpan = _testDate.AddMonths(validMonths) - _testDate;
+            var expectedPremium = Convert.ToDecimal(0.33*timeSpan.Days);
             _testInsuranceCompany.AvailableRisks.Add(fireRisk);
+
             var soldPolicy = _testInsuranceCompany.SellPolicy(
                 InsuredObjectName,
                 _testDate,
                 2,
-                new List<Risk> { _testRisk });
+                new List<Risk> { _testRisk, fireRisk });
 
-            _testInsuranceCompany.AddRisk(
+            _testInsuranceCompany.RemoveRisk(
                 InsuredObjectName,
                 fireRisk,
                 _testDate,
                 _testDate);
-
-            Assert.IsTrue(soldPolicy.InsuredRisks.Contains(fireRisk));
-        }*/
+            
+            Assert.AreEqual(expectedPremium, soldPolicy.Premium);
+        }
     }
 }
